@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+    <title>CS20 API Fun</title>
+    <meta charset="utf-8"/>
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: 10% 10% 10% 10% 10% 10% 10%;
+            width: 100%;
+            grid-column-gap: 4%;
+        }
+        @media screen and (max-width: 800px) {
+            .grid {
+                grid-template-columns: 10% 10% 10%;
+                margin-left: 7%;
+                grid-column-gap: 20%;
+            }
+        }
+        .box {
+            text-align: left;
+            background-color: white;
+            width: 80%;
+            min-width: 300px;
+            border: 15px solid #320505;
+            align: justify;
+            font-family: Gill Sans, sans-serif;
+            color: #320505;
+            font-size: 25px;
+            padding: 40px;
+            margin: 20px;
+        }
+        button {
+            background-color: #320505;
+            font-family: Gill Sans, sans-serif;
+            color: white;
+            border: 10px;
+            padding: 5px;
+            text-align: center;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .inputlocation {
+            border: 10px;
+            font-family: Gill Sans, sans-serif;
+            font-size: 30px;
+            padding: 5px;
+            border: 1px solid black;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        function loadMessages() {
+            document.getElementById('messages').innerHTML = "Loading...";
+            wordlocation = findlocation();
+            url = "https://weatherdbi.herokuapp.com/data/weather/" + wordlocation;
+            //fetches api from url
+            fetch(url)
+            //error message for initial response
+            .then(function(response) {
+                document.getElementById("messages").innerHTML = "Invalid Location, Try Again!";
+                return response.json();
+            })
+            //rewrite the message is data is filled from url
+            .then(function(data){
+                printweather(JSON.parse(JSON.stringify(data)));
+            })
+        }
+        function findlocation() {
+            //access location from text input
+            locationfound = document.querySelector('input').value;
+            //remove all spaces
+            newlocation = locationfound.split(" ").join("");
+            return newlocation.toLowerCase();
+        }
+        function printweather(data) {
+            gridmessage = "<center>" + data.region + "</center><br><div class='grid'>";
+            for (j = 0; j < 7; j++) {
+                gridmessage += "<text>" + data.next_days[j].day + "<p style='font-size: 20px'>";
+                gridmessage += "<img src='" + data.next_days[j].iconURL + "' width=80px><br>";
+                gridmessage += data.next_days[j].comment + "</p></text>";
+            }
+            document.getElementById("messages").innerHTML =  gridmessage + "</div><br>";
+        }
+    </script>
+</head>
+
+
+<body style="background-color: #FFE9E9">
+    <center>
+        <div class="box">
+            <center><h2>Weather API</h2></center>
+            <p>I selected a weather information API that produces current and
+            forecasts for the weather in a provided location in JSON format.<br>
+            I found it on in a <a href="https://mixedanalytics.com/blog/list-actually-free-open-no-auth-needed-apis/">
+            website page</a> named "Big List of Free and Open Public APIs (No Auth Needed)"<br>
+            For the API request, there is an input box for a region provided by
+            a client and this program focuses on seven days in this locations,
+            providing very basic weather information with simple comments. <br>
+            To determine comfortable clothing on a given day or planning a trip 
+            based off the weather, this API would be helpful. <br>
+        </div>
+    <div class="box">
+        <center>
+            <form>
+                Enter a valid region/city:<br><input type='text' class="inputlocation" id='cityinput'>
+            </form>
+            <button onclick="loadMessages()"> Click Here </button>
+            <br> <br>
+            <center>
+                <div id="messages"></div>
+            <center>
+            </div>
+        </center>
+    </center>
+</body>
+</html>
